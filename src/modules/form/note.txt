@@ -1,0 +1,46 @@
+Use controlled components for your forms
+Use visual indicators(*) for required fields
+Use the appropriate input type for each field
+
+Use a library for schema validation
+Use descriptive, helpful error messages
+Use debounce function for remote validation
+
+Validate on blur
+Consider providing real-time feedback for field validation
+Disable the submit button until the form is valid
+
+Avoid using auto-complete for sensitive fields
+Validate input on both the client side and server side
+
+======= Form =======
+
+- Text
+- Number
+- Email
+- Select
+- Toggle
+- Checkbox
+- Image
+- File
+- Text Editor
+
+
+
+
+======= Link =======
+React Hook Form: https://react-hook-form.com/docs/useform
+
+1. input number
+  - don't use input type number, reason below...
+  - https://mui.com/material-ui/react-text-field/#type-quot-number-quot
+  - https://technology.blog.gov.uk/2020/02/24/why-the-gov-uk-design-system-team-changed-the-input-type-for-numbers/  
+
+
+
+
+======= React Hook Form =======
+
+1. Set form data
+  - values(Generic props) + state
+  - reset method

@@ -6,12 +6,21 @@ interface ITextFieldProps extends ComponentPropsWithoutRef<"input"> {
   error?: string;
   containerCls?: string;
   labelCls?: string;
+  required?: boolean;
 }
 
 const TextField = forwardRef(
   (inputProps: ITextFieldProps, ref: Ref<HTMLInputElement>) => {
-    const { id, name, className, label, containerCls, error, ...props } =
-      inputProps;
+    const {
+      id,
+      name,
+      className,
+      label,
+      containerCls,
+      error,
+      required,
+      ...props
+    } = inputProps;
 
     return (
       <div className={tw("mb-5", containerCls)}>
@@ -21,6 +30,7 @@ const TextField = forwardRef(
             className="block mb-1 text-gray-500 font-semibold capitalize"
           >
             {label}
+            {required && <span className="text-red-500"> (*)</span>}
           </label>
         )}
 

@@ -1,45 +1,42 @@
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import TextField from "../../components/TextField";
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
 
 interface IFormData {
   fullname: string;
-  address: string;
+  age: number | undefined;
   showInput: boolean | undefined;
 }
 
 const schema = yup.object({
-  fullname: yup.string().required(),
-  address: yup.string().required(),
+  fullname: yup.string().trim().max(15).required("required field"),
+  age: yup.number().typeError("number field").min(1).max(100),
   showInput: yup.boolean(),
 });
 
 export default function HookFormLib() {
+  const navigate = useNavigate();
+
+  const [initFormData, setInitFormData] = useState<IFormData>();
+
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty, isSubmitted, isValid },
-    watch,
     reset,
-    setValue,
   } = useForm<IFormData>({
+    mode: "onBlur",
     resolver: yupResolver(schema),
+    // values: initFormData,
   });
 
-  const onSubmit = (data: IFormData) => {
-    console.log("call api", data);
+  const onSubmit: SubmitHandler<IFormData> = (data, e) => {
+    console.log("submmit data: ", data);
+    // navigate("/");
   };
-
-  useEffect(() => {
-    reset({
-      fullname: "Ta Cong Duc",
-      address: "Hanoi",
-      showInput: true,
-    });
-  }, []);
 
   console.log("state", {
     isDirty,
@@ -48,16 +45,32 @@ export default function HookFormLib() {
   });
 
   useEffect(() => {
-    const handleConfirm = (e: BeforeUnloadEvent) => {
+    // fetch data or do something to get data. Then, set the data to form with reset method
+
+    const data = {
+      fullname: "Ta Cong Duc",
+      age: 1,
+      showInput: true,
+    };
+
+    reset(data);
+
+    // setInitFormData(data);
+  }, [reset]);
+
+  useEffect(() => {
+    // alert when you change form data and reload or close page
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "";
     };
 
     if (isDirty) {
-      window.addEventListener("beforeunload", handleConfirm);
+      window.addEventListener("beforeunload", handleBeforeUnload);
 
       return () => {
-        window.removeEventListener("beforeunload", handleConfirm);
+        window.removeEventListener("beforeunload", handleBeforeUnload);
       };
     }
   }, [isDirty]);
@@ -71,15 +84,20 @@ export default function HookFormLib() {
           placeholder="Your name..."
           {...register("fullname")}
           error={errors.fullname?.message}
+          required
         />
 
         <TextField
-          label="address"
-          id="address"
-          placeholder="Your address..."
-          {...register("address")}
-          error={errors.address?.message}
+          inputMode="numeric"
+          pattern="[0-9]*"
+          label="age"
+          id="age"
+          placeholder="Your age..."
+          {...register("age")}
+          error={errors.age?.message}
         />
+
+        {/* <input type="text" inputMode="numeric" pattern="[0-9]*" /> */}
 
         <div className="flex gap-10">
           <label>
@@ -90,20 +108,25 @@ export default function HookFormLib() {
           {/* {watch("showInput") && <p>fullname value: {watch("fullname")}</p>} */}
         </div>
 
-        {/* yeu cau type button de khi reset form se tu goi submit */}
-        <button
-          type="button"
-          className="block mt-5 text-white bg-black"
-          onClick={() => reset()}
-        >
-          Reset
-        </button>
+        {/* default type of button in form = submit, add type to avoid submit form*/}
+        <div className="flex gap-5">
+          <button
+            type="button"
+            className="mt-5 p-1 text-white bg-black disabled:bg-gray-400 disabled:cursor-no-drop"
+            disabled={!isDirty}
+            onClick={() => reset()}
+          >
+            Reset
+          </button>
 
-        <button type="submit" className="mt-5 text-white bg-black">
-          Submit
-        </button>
-
-        <Link to={"/home"}>Re-direct</Link>
+          <button
+            type="submit"
+            className="mt-5 p-1 text-white bg-black disabled:bg-gray-400 disabled:cursor-no-drop	"
+            disabled={!isDirty}
+          >
+            Submit
+          </button>
+        </div>
       </form>
     </>
   );
