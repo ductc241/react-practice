@@ -19,6 +19,7 @@ Validate input on both the client side and server side
 - Number
 - Email
 - Select
+- Autocomplete
 - Toggle
 - Checkbox
 - Image
@@ -26,6 +27,7 @@ Validate input on both the client side and server side
 - Text Editor
 
 
+Object.entries(userData).forEach(([name, value]) => setValue(name, value));
 
 
 ======= Link =======
@@ -36,7 +38,8 @@ React Hook Form: https://react-hook-form.com/docs/useform
   - https://mui.com/material-ui/react-text-field/#type-quot-number-quot
   - https://technology.blog.gov.uk/2020/02/24/why-the-gov-uk-design-system-team-changed-the-input-type-for-numbers/  
 
-
+2. select:
+  - custom component: https://github.com/orgs/react-hook-form/discussions/2825
 
 
 ======= React Hook Form =======

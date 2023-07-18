@@ -1,19 +1,28 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import TextField from "../../components/TextField";
+import AngleIcon from "../../icons/AngleIcon";
 
 interface IFormData {
   fullname: string;
-  age: number | undefined;
-  showInput: boolean | undefined;
+  age?: number;
+  email?: string;
+  showInput?: boolean;
 }
 
-const schema = yup.object({
+const schema: yup.ObjectSchema<IFormData> = yup.object({
   fullname: yup.string().trim().max(15).required("required field"),
-  age: yup.number().typeError("number field").min(1).max(100),
+  age: yup
+    .number()
+    .transform((value) => (isNaN(value) ? undefined : value))
+    .min(1),
+  email: yup.string().email(),
   showInput: yup.boolean(),
 });
 
@@ -49,7 +58,7 @@ export default function HookFormLib() {
 
     const data = {
       fullname: "Ta Cong Duc",
-      age: 1,
+      email: "ductc.dev@gmail.com",
       showInput: true,
     };
 
@@ -97,7 +106,16 @@ export default function HookFormLib() {
           error={errors.age?.message}
         />
 
-        {/* <input type="text" inputMode="numeric" pattern="[0-9]*" /> */}
+        <TextField
+          type="email"
+          label="email"
+          id="email"
+          placeholder="Your email..."
+          {...register("email")}
+          error={errors.email?.message}
+        />
+
+        <AngleIcon />
 
         <div className="flex gap-10">
           <label>
