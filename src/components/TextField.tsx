@@ -23,7 +23,7 @@ const TextField = forwardRef(
     } = inputProps;
 
     return (
-      <div className={tw("mb-5", containerCls)}>
+      <div className={tw(containerCls)}>
         {label && (
           <label
             htmlFor={id}
@@ -39,7 +39,7 @@ const TextField = forwardRef(
           id={id}
           name={name}
           className={tw(
-            "w-full px-3 py-2.5 border border-2 rounded-md outline-none",
+            "w-full px-3 py-2.5 border rounded-md outline-none",
             error ? "border-red-500 text-red-500" : "border-gray-300",
             className
           )}

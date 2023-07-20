@@ -2,18 +2,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import TextField from "../../components/TextField";
-import AngleIcon from "../../icons/AngleIcon";
+import Select from "react-select";
 
-interface IFormData {
+export interface IFormData {
   fullname: string;
   age?: number;
   email?: string;
   showInput?: boolean;
+  gender: string;
 }
 
 const schema: yup.ObjectSchema<IFormData> = yup.object({
@@ -24,52 +24,54 @@ const schema: yup.ObjectSchema<IFormData> = yup.object({
     .min(1),
   email: yup.string().email(),
   showInput: yup.boolean(),
+  gender: yup.string().required("required field"),
 });
 
 export default function HookFormLib() {
-  const navigate = useNavigate();
-
-  const [initFormData, setInitFormData] = useState<IFormData>();
+  // const [initFormData, setInitFormData] = useState<IFormData>();
 
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty, isSubmitted, isValid },
     reset,
+    control,
+    getValues,
   } = useForm<IFormData>({
     mode: "onBlur",
     resolver: yupResolver(schema),
     // values: initFormData,
+    defaultValues: {
+      fullname: "",
+      age: undefined,
+      email: undefined,
+      showInput: false,
+      gender: "",
+    },
   });
 
-  const onSubmit: SubmitHandler<IFormData> = (data, e) => {
+  const genderOption = [
+    { label: "Male", value: "male" },
+    { label: "Female", value: "female" },
+  ];
+
+  const onSubmit: SubmitHandler<IFormData> = (data) => {
     console.log("submmit data: ", data);
-    // navigate("/");
   };
 
-  console.log("state", {
-    isDirty,
-    isSubmitted,
-    isValid,
-  });
+  // useEffect(() => {
+  //   // fetch data or do something to get data. Then, set the data to form with reset method
+  //   const data: IFormData = {
+  //     fullname: "Ta Cong Duc",
+  //     gender: "female",
+  //   };
+
+  //   reset(data);
+
+  //   // setInitFormData(data);
+  // }, [reset]);
 
   useEffect(() => {
-    // fetch data or do something to get data. Then, set the data to form with reset method
-
-    const data = {
-      fullname: "Ta Cong Duc",
-      email: "ductc.dev@gmail.com",
-      showInput: true,
-    };
-
-    reset(data);
-
-    // setInitFormData(data);
-  }, [reset]);
-
-  useEffect(() => {
-    // alert when you change form data and reload or close page
-
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "";
@@ -84,6 +86,15 @@ export default function HookFormLib() {
     }
   }, [isDirty]);
 
+  console.log("state", {
+    isDirty,
+    isSubmitted,
+    isValid,
+    errors,
+  });
+
+  console.log(getValues());
+
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -91,39 +102,71 @@ export default function HookFormLib() {
           label="fullname"
           id="fullname"
           placeholder="Your name..."
+          containerCls="mb-5"
           {...register("fullname")}
           error={errors.fullname?.message}
           required
         />
 
         <TextField
+          label="age"
           inputMode="numeric"
           pattern="[0-9]*"
-          label="age"
           id="age"
           placeholder="Your age..."
+          containerCls="mb-5"
           {...register("age")}
           error={errors.age?.message}
         />
 
         <TextField
-          type="email"
           label="email"
+          type="email"
           id="email"
           placeholder="Your email..."
+          containerCls="mb-5"
           {...register("email")}
           error={errors.email?.message}
         />
 
-        <AngleIcon />
+        <div className="mb-5">
+          <p className="mb-1 text-gray-500 font-semibold capitalize">
+            Gender <span className="text-red-500">(*)</span>{" "}
+          </p>
+          <Controller
+            name="gender"
+            control={control}
+            render={({ field }) => (
+              <Select
+                placeholder="Select gender"
+                options={genderOption}
+                styles={{
+                  control: (styles) => ({
+                    ...styles,
+                    height: "48px",
+                  }),
+                }}
+                value={
+                  genderOption.find((option) => option.value === field.value) ??
+                  null
+                }
+                onChange={(option) => field.onChange(option?.value as string)}
+                onBlur={field.onBlur}
+              />
+            )}
+          />
+          {errors.gender && (
+            <span className="block mt-1 text-red-500">
+              {errors.gender.message}
+            </span>
+          )}
+        </div>
 
         <div className="flex gap-10">
           <label>
             <input type="checkbox" {...register("showInput")} />
             <span className="ml-1">Show</span>
           </label>
-
-          {/* {watch("showInput") && <p>fullname value: {watch("fullname")}</p>} */}
         </div>
 
         {/* default type of button in form = submit, add type to avoid submit form*/}

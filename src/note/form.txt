@@ -15,10 +15,10 @@ Validate input on both the client side and server side
 
 ======= Form =======
 
-- Text
-- Number
-- Email
-- Select
+✔ Text
+✔ Number
+✔ Email
+✔ Select - (using react-select)
 - Autocomplete
 - Toggle
 - Checkbox
@@ -40,6 +40,8 @@ React Hook Form: https://react-hook-form.com/docs/useform
 
 2. select:
   - custom component: https://github.com/orgs/react-hook-form/discussions/2825
+  - react-select
+    - set value = null to reset field
 
 
 ======= React Hook Form =======
