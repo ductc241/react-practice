@@ -2,11 +2,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import { useEffect, useState } from "react";
-import * as yup from "yup";
+import Select from "react-select";
+import DatePicker from "react-datepicker";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
 import TextField from "../../components/TextField";
-import Select from "react-select";
+import Switch from "../../components/Switch";
 
 export interface IFormData {
   fullname: string;
@@ -14,6 +17,9 @@ export interface IFormData {
   email?: string;
   showInput?: boolean;
   gender: string;
+  file: FileList;
+  date: string;
+  toggle: boolean;
 }
 
 const schema: yup.ObjectSchema<IFormData> = yup.object({
@@ -25,6 +31,19 @@ const schema: yup.ObjectSchema<IFormData> = yup.object({
   email: yup.string().email(),
   showInput: yup.boolean(),
   gender: yup.string().required("required field"),
+  file: yup
+    .mixed<FileList>()
+    .required("required field")
+    .test("fileSize", "File is too large, max 2MB", (files) =>
+      Array.from(files).every((file) => file.size <= 2_000_000)
+    )
+    .test("fileType", "Invalid file type", (files) =>
+      Array.from(files).every((file) =>
+        ["image/jpeg", "image/png"].includes(file.type)
+      )
+    ),
+  date: yup.string().required(),
+  toggle: yup.boolean().required(),
 });
 
 export default function HookFormLib() {
@@ -93,13 +112,13 @@ export default function HookFormLib() {
     errors,
   });
 
-  console.log(getValues());
+  console.log("value", getValues());
 
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <TextField
-          label="fullname"
+          label="Input - text"
           id="fullname"
           placeholder="Your name..."
           containerCls="mb-5"
@@ -109,7 +128,7 @@ export default function HookFormLib() {
         />
 
         <TextField
-          label="age"
+          label="Input - number"
           inputMode="numeric"
           pattern="[0-9]*"
           id="age"
@@ -120,7 +139,7 @@ export default function HookFormLib() {
         />
 
         <TextField
-          label="email"
+          label="Input - email"
           type="email"
           id="email"
           placeholder="Your email..."
@@ -131,7 +150,7 @@ export default function HookFormLib() {
 
         <div className="mb-5">
           <p className="mb-1 text-gray-500 font-semibold capitalize">
-            Gender <span className="text-red-500">(*)</span>{" "}
+            Select <span className="text-red-500">(*)</span>{" "}
           </p>
           <Controller
             name="gender"
@@ -143,7 +162,7 @@ export default function HookFormLib() {
                 styles={{
                   control: (styles) => ({
                     ...styles,
-                    height: "48px",
+                    height: "46px",
                   }),
                 }}
                 value={
@@ -161,6 +180,30 @@ export default function HookFormLib() {
             </span>
           )}
         </div>
+
+        <div className="mb-5">
+          <Controller
+            name="date"
+            control={control}
+            render={({ field }) => (
+              <DatePicker
+                placeholderText="Select your birthday"
+                dateFormat="dd/MM/yyyy"
+                selected={field.value ? new Date(field.value) : null}
+                onChange={(date) =>
+                  field.onChange((date as Date).toISOString())
+                }
+              />
+            )}
+          />
+        </div>
+
+        <div className="mb-5">
+          <Switch registerProps={{ ...register("toggle") }} />
+          {/* <Switch onChangeValue={(value) => console.log(value)} /> */}
+        </div>
+
+        <input type="file" className="mb-5" {...register("file")} />
 
         <div className="flex gap-10">
           <label>
