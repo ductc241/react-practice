@@ -4,25 +4,21 @@ import { twMerge as tw } from "tailwind-merge";
 interface ISwitchProps {
   value?: boolean;
   label?: string;
-  onChange?: (value: boolean) => void;
+  registerProps?: object;
 }
 
-const Switch = forwardRef(
+const SwitchCustom = forwardRef(
   (props: ISwitchProps, ref: ForwardedRef<HTMLDivElement>) => {
-    const { value = false, label, onChange: handleChangeValue } = props;
+    const { value = false, label, registerProps } = props;
 
     const [isChecked, setIsChecked] = useState<boolean>(value);
 
-    const handleChange = () => {
-      if (handleChangeValue) handleChangeValue(isChecked);
-    };
-
     return (
       <label className="relative inline-flex items-center cursor-pointer">
-        <input type="checkbox" className="hidden" onChange={handleChange} />
+        <input type="checkbox" className="hidden" {...registerProps} />
         <div
           className={tw(
-            "w-11 h-6 bg-gray-200 rounded-full border focus:border-blue-500",
+            "w-11 h-6 bg-gray-200 rounded-full",
             "after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all",
             isChecked && "bg-blue-600 after:translate-x-full after:border-white"
           )}
@@ -36,4 +32,4 @@ const Switch = forwardRef(
   }
 );
 
-export default Switch;
+export default SwitchCustom;

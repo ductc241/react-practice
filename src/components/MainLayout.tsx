@@ -15,10 +15,15 @@ const MainLayout = () => {
               Form
             </Link>
           </li>
+          <li>
+            <Link className="font-semibold" to="/multi-step">
+              Multistep Form
+            </Link>
+          </li>
         </ul>
       </header>
 
-      <div className="container mx-auto">
+      <div className="container mx-auto px-2">
         <Outlet />
       </div>
     </>

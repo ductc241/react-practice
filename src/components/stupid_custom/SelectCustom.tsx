@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { twMerge as tw } from "tailwind-merge";
-import AngleIcon from "../icons/AngleIcon";
+import AngleIcon from "../../icons/AngleIcon";
 import { ControllerRenderProps } from "react-hook-form";
 
 interface IOption {

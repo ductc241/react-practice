@@ -8,8 +8,9 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import TextField from "../../components/TextField";
-import Switch from "../../components/Switch";
+import TextField from "../../../components/TextField";
+import Switch from "../../../components/Switch";
+import Upload from "../../../components/Upload";
 
 export interface IFormData {
   fullname: string;
@@ -17,7 +18,7 @@ export interface IFormData {
   email?: string;
   showInput?: boolean;
   gender: string;
-  file: FileList;
+  file?: FileList | null;
   date: string;
   toggle: boolean;
 }
@@ -26,7 +27,7 @@ const schema: yup.ObjectSchema<IFormData> = yup.object({
   fullname: yup.string().trim().max(15).required("required field"),
   age: yup
     .number()
-    .transform((value) => (isNaN(value) ? undefined : value))
+    .transform((value) => (isNaN(value) ? 0 : value))
     .min(1),
   email: yup.string().email(),
   showInput: yup.boolean(),
@@ -34,10 +35,15 @@ const schema: yup.ObjectSchema<IFormData> = yup.object({
   file: yup
     .mixed<FileList>()
     .required("required field")
-    .test("fileSize", "File is too large, max 2MB", (files) =>
+    .test(
+      "fileLength",
+      "required file",
+      (files) => Array.from(files).length > 0
+    )
+    .test("fileSize", "file is too large, max 2MB", (files) =>
       Array.from(files).every((file) => file.size <= 2_000_000)
     )
-    .test("fileType", "Invalid file type", (files) =>
+    .test("fileType", "invalid file type", (files) =>
       Array.from(files).every((file) =>
         ["image/jpeg", "image/png"].includes(file.type)
       )
@@ -66,6 +72,7 @@ export default function HookFormLib() {
       email: undefined,
       showInput: false,
       gender: "",
+      toggle: false,
     },
   });
 
@@ -157,14 +164,15 @@ export default function HookFormLib() {
             control={control}
             render={({ field }) => (
               <Select
-                placeholder="Select gender"
-                options={genderOption}
                 styles={{
                   control: (styles) => ({
                     ...styles,
                     height: "46px",
                   }),
                 }}
+                placeholder="Select gender"
+                name={field.name}
+                options={genderOption}
                 value={
                   genderOption.find((option) => option.value === field.value) ??
                   null
@@ -198,12 +206,50 @@ export default function HookFormLib() {
           />
         </div>
 
+        {/* <input type="file" className="mb-5" {...register("file")} /> */}
+
+        {/* <Upload containerCls="mb-5" onChange={(value) => console.log(value)} /> */}
+
         <div className="mb-5">
-          <Switch registerProps={{ ...register("toggle") }} />
-          {/* <Switch onChangeValue={(value) => console.log(value)} /> */}
+          <Controller
+            name="file"
+            control={control}
+            render={({ field }) => (
+              <Upload
+                containerCls="mb-5"
+                onChange={(value) => field.onChange(value)}
+              />
+            )}
+          />
+
+          {errors.toggle && (
+            <span className="block mt-1 text-red-500">
+              {errors.toggle.message}
+            </span>
+          )}
         </div>
 
-        <input type="file" className="mb-5" {...register("file")} />
+        <div className="mb-5">
+          <Controller
+            name="toggle"
+            control={control}
+            render={({ field }) => (
+              <>
+                <Switch
+                  ref={field.ref}
+                  value={field.value}
+                  onChange={(value) => field.onChange(value)}
+                />
+              </>
+            )}
+          />
+
+          {errors.toggle && (
+            <span className="block mt-1 text-red-500">
+              {errors.toggle.message}
+            </span>
+          )}
+        </div>
 
         <div className="flex gap-10">
           <label>
@@ -225,7 +271,7 @@ export default function HookFormLib() {
 
           <button
             type="submit"
-            className="mt-5 p-1 text-white bg-black disabled:bg-gray-400 disabled:cursor-no-drop	"
+            className="mt-5 p-1 text-white bg-black disabled:bg-gray-400 disabled:cursor-no-drop"
             disabled={!isDirty}
           >
             Submit

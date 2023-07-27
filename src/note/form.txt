@@ -30,6 +30,9 @@ Validate input on both the client side and server side
 - Text Editor
 
 
+- Multi-Step Form
+
+
 Object.entries(userData).forEach(([name, value]) => setValue(name, value));
 
 
